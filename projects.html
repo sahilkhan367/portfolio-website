@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Sahil khan Projects</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css.css" rel="stylesheet">
+        <head>
+            <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+           <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+              <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+            </head>
+          
+    </head>
+    <body style="background-color:#222327;">
+    
+        <nav>
+        <div class="navigation">
+            <ul>
+                <li class="list ">
+                    <a href="index.html">
+                        <span class="icon">
+                            <ion-icon name="home"></ion-icon>
+                        </span>
+                        <span class="text">Home</span>
+                    </a>
+                </li>
+                <li class="list">
+                    <a href="edu.html">
+                        <span class="icon">
+                            <ion-icon name="school"></ion-icon>
+                        </span>
+                        <span class="text">Education</span>
+                    </a>
+                </li>
+                <li class="list">
+                    <a href="Services.html">
+                        <span class="icon">
+                            <ion-icon name="desktop"></ion-icon>
+                        </span>
+                        <span class="text">Skills</span>
+                    </a>
+                </li>
+                <li class="list active">
+                    <a href="projects.html">
+                        <span class="icon">
+                            <ion-icon name="construct"></ion-icon>
+                        </span>
+                        <span class="text">Projects</span>
+                    </a>
+                </li>   <li class="list">
+                    <a href="contact.html">
+                        <span class="icon">
+                            <ion-icon name="call"></ion-icon>
+                        </span>
+                        <span class="text">Contact</span>
+                    </a>
+                </li>
+                <div class="indicator"></div>
+            </ul>
+        </div>
+    </nav> 
+<section class="home" id="home">
+    <div class="max-width1">
+        <div class="home-content"> 
+    <br>
+    <br>
+    <br>
+    <hr>
+    <br>
+    <section class="content" id="content">
+        <h2>Truck Driving from home (Prototype) </h2>
+        <h3>It is an IOT based project which will let the truck drivers to control the truck from any where on the earth</h3>
+        <h3>A truck or vehicle that can be controlled with unlimited range over the internet</h3>
+        <center>
+        <button method="get">
+            <a href="project.pdf" class="btn btn-white btn-animate">Project Report Download</a>
+        </button>
+    </center>
+        <br>
+        <br>
+        <br>
+        <hr>
+    <br>
+    <br>
+    <hr>
+    <br>
+    <section class="content" id="content">
+        <h2>You Tube Video Downloder</h2>
+        <h3>It is a website which will let the users to Download Youtube Video in there local disk storage</h3>
+        <h3>The website is made with the help of Python Webframe work FLASK</h3>
+        <center>
+            <button method="link">
+                <a href="http://sahilkhan.pythonanywhere.com/" class="btn btn-white btn-animate">Go To The Website</a>
+            </button>
+        </center>
+    <br>
+    <br>
+    <br>
+    <hr>
+    <br>
+    <br>
+    <br>
+    </div>
+</section>  
+    
+    <script>
+        const list = document.querySelectorAll('.list');
+        function activeLink(){
+            list.forEach((item)=>item.classList.remove('active'));
+            this.classList.add('active');
+        }
+        list.forEach((item)=>item.addEventListener('click',activeLink));
+    </script> 
+    <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
+    </body>
+</html>

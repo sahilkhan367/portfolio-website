@@ -6,8 +6,15 @@
     <link rel="stylesheet" href="styles.css">
     <title>Employee Management</title>
 </head>
+<div class="header">
+    <a href="#default" class="logo">Harshitha JB</a>
+    <div class="header-right">
+      <a href="harshitha.pdf">Download CV</a>
+    </div>
+  </div>
+
 <body>
-    <h1>Employee Data</h1>
+    <h2>Employee Data</h2>
 
     <!-- Display Employee Data -->
     <table id="employee-table">
@@ -25,6 +32,7 @@
             <!-- Employee data will be displayed here -->
         </tbody>
     </table>
+    <hr>
 
     <!-- Add New Employee -->
     <div class="fixed-form">
@@ -45,8 +53,11 @@
         <label for="age">Age:</label>
         <input type="text" id="age" required><br><br>
 
-        <button type="button" id="add-button">Add Employee</button>
+        <div class="wrap">
+        <button  class="button" type="button" id="add-button">Add Employee</button>
+        </div>
     </form>
+ 
     
 
     <!-- JavaScript Code -->
@@ -83,9 +94,10 @@
                     <td>${employee.Salary}</td>
                     <td>${employee.Age}</td>
                     <td>
-                        <button onclick="editEmployee(${index})">Edit</button>
-                        <button onclick="deleteEmployee(${index})">Delete</button>
+                        <button onclick="editEmployee(${index})" class="edit-button">Edit</button>
+                        <button onclick="deleteEmployee(${index})" class="delete-button">Delete</button>
                     </td>
+
                 `;
                 tbody.appendChild(row);
             });

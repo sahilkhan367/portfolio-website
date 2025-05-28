@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HVAC Project Documentation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    h1, h2, h3 {
+      color: #1a73e8;
+    }
+    pre {
+      background: #e8f0fe;
+      padding: 10px;
+      overflow-x: auto;
+      border-left: 4px solid #1a73e8;
+    }
+    .flowchart {
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ccc;
+      margin-bottom: 30px;
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+    }
+    ul, ol {
+      margin-bottom: 1rem;
+    }
+    li {
+      margin-bottom: 0.5rem;
+    }
+    section {
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>HVAC Project Documentation</h1>
+
+  <section>
+    <h2>1. Overview</h2>
+    <p>This project outlines the development of an HVAC control system integrated with Modbus communication, a web interface, and role-based access control. It provides temperature and fan speed monitoring and control for various users, including Admin, BMS, Employees, and Clients.</p>
+  </section>
+
+  <section>
+    <h2>2. System Architecture</h2>
+    <ul>
+      <li><strong>Outdoor Unit</strong></li>
+      <li><strong>Indoor Unit</strong></li>
+      <li><strong>USB to RS485 Converter</strong></li>
+      <li><strong>Modbus RTU Communication</strong> via RS485</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. Backend Server Code (Python)</h2>
+    <pre>
+from pymodbus.client import ModbusSerialClient
+from pymodbus.exceptions import ModbusException
+
+modbus_client = ModbusSerialClient(
+    port="/dev/ttyUSB1",
+    baudrate=9600,
+    stopbits=1,
+    bytesize=8,
+    parity='E',
+    timeout=1
+)
+
+modbus_client.connect()
+
+# Turn ON/OFF
+modbus_client.write_coil(address, value, slave=slave_id)
+
+# Set Temperature and Fan Speed
+modbus_client.write_register(address, value, slave=slave_id)
+
+# Read ON/OFF Status
+discrete = modbus_client.read_discrete_inputs(register_address_on_off, slave=slave_id)
+input_status = int(discrete.bits[0]) if discrete and not discrete.isError() else 0
+
+# Read Temperature
+temp_result = modbus_client.read_input_registers(register_address_temp, count=1, slave=slave_id)
+temperature = temp_result.registers[0] / 10 if temp_result and not temp_result.isError() else 0
+
+# Read Fan Speed
+speed_result = modbus_client.read_input_registers(register_address_speed, count=1, slave=slave_id)
+speed = speed_result.registers[0] if speed_result and not speed_result.isError() else 0
+
+return {
+    "Status": input_status,
+    "Temp": temperature,
+    "Speed": speed
+}
+    </pre>
+  </section>
+
+  <section>
+    <h2>4. User Roles and Flow</h2>
+    <ul>
+      <li><strong>Admin:</strong> Full access to all branches and HVAC control options.</li>
+      <li><strong>BMS:</strong> Branch-scoped access based on assignment.</li>
+      <li><strong>Employee:</strong> Cabin-level access through departments mapping.</li>
+      <li><strong>Client:</strong> Access limited to personal cabin vents.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>5. Database Doctypes</h2>
+    <ul>
+      <li><strong>Branch</strong> – Contains child tables for Floors and BMS users.</li>
+      <li><strong>HVAC Data</strong> – Connects Floor → Cabin → Vent hierarchy.</li>
+      <li><strong>Departments/User</strong> – Used to map Employees to Cabins.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>6. Doctype Flow</h2>
+    <h3>Admin Flow</h3>
+    <ol>
+      <li>Select Branch from <code>Branches</code> doctype.</li>
+      <li>Display Floors from the child table.</li>
+      <li>Filter Cabins based on the selected Floor.</li>
+      <li>Display Vent Numbers from the selected Cabin.</li>
+    </ol>
+
+    <h3>BMS Flow</h3>
+    <ol>
+      <li>Identify Branch using BMS user in <code>Branches</code> doctype.</li>
+      <li>Show Floors linked to that Branch.</li>
+      <li>Filter Cabins by selected Floor.</li>
+      <li>Show Vent Numbers from the selected Cabin.</li>
+    </ol>
+
+    <h3>Employee Flow</h3>
+    <ol>
+      <li>Get Departments from User record.</li>
+      <li>Find associated Cabin from <code>HVAC Data</code>.</li>
+      <li>Use Cabin to locate the Vent Number.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>7. User Flow Diagram</h2>
+    <div class="flowchart">
+[Start] 
+   ↓
+[User Login]
+   ↓
+[Check Role]
+   ↓
+┌─────────────┬──────────────┬───────────────┬────────────┐
+│   [Admin]   │     [BMS]    │  [Employee]   │  [Client]  │
+└─────┬───────┴─────┬────────┴──────┬────────┴──────┬────┘
+      ↓              ↓                  ↓              ↓
+[Select Branch] [Get Branch]     [Get Department]  [Get Cabin]
+      ↓              ↓                  ↓              ↓
+[Select Floor]  [Select Floor]     [Find Cabin]    [Get Vent]
+      ↓              ↓                  ↓              ↓
+[Select Cabin] [Select Cabin]    [Get Vent No.]  [Control Vent]
+      ↓              ↓                  ↓              ↓
+[Get Vent No.] [Get Vent No.]     [Control Vent]  [Display Info]
+      ↓              ↓
+[Control Vent] [Control Vent]
+      ↓              ↓
+     [Done]         [Done]
+    </div>
+  </section>
+
+  <section>
+    <h2>8. Backend Modbus Flow</h2>
+    <div class="flowchart">
+[Client Request]
+     ↓
+[API (GET/POST)]
+     ↓
+[ModbusSerialClient Setup]
+     ↓
+[Is Connected?]
+     ↓
+  ┌───────Yes────────┐
+  ↓                  ↓
+[Write Coil]      [Write Register]
+(ON/OFF)          (Temp, Speed)
+  ↓                  ↓
+[Read Discrete]   [Read Input Register]
+  ↓                  ↓
+[Return Status, Temp, Speed]
+     ↓
+   [Respond to Client]
+    </div>
+  </section>
+<section>
+    <h2>9. Api curl cmd</h2>
+    <p>Curl cmd to controll On and off curl -X POST http://10.80.4.31:8000/api/control -H "Content-Type: application/json" -d "{\"action\":\"coil\",\"value\":1,\"address\":7448,\"slave_id\":1}"  </p>
+    <p> Curl cmd to controll temp curl -X POST http://10.80.4.31:8000/api/control -H "Content-Type: application/json" -d "{\"action\":\"temp\",\"value\":1,\"address\":7448,\"slave_id\":1}"  </p>
+    <p> Curl cmd to controll fan speed curl -X POST http://10.80.4.31:8000/api/control -H "Content-Type: application/json" -d "{\"action\":\"fan_speed\",\"value\":1,\"address\":7448,\"slave_id\":1}"  </p>
+    <p>curl cmd to get the data curl "http://10.80.4.31:8000/api/status?on=6384&temp=6553&speed=6588&slave_id=1"</p>
+
+
+  </section>
+
+
+
+  <section>
+    <h2>10. Conclusion</h2>
+    <p>This HVAC system is built on a solid architecture leveraging Modbus communication and role-based access control through a web interface. The modular and scalable design ensures flexibility and future expansion.</p>
+  </section>
+</body>
+</html>
